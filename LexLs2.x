@@ -21,6 +21,7 @@ tokens :-
 	parametro | valor | simbolo |
 	pasos | angulo | posicion | matriz |
 	generatriz | probabilidad 					 { \s -> TkRes s}
+<<<<<<< HEAD
 	Real | Entero												 { \s -> TkTipo s}
 	[$digit]+														 { \s -> TkEnt ( read s)}
 	[$digit]+\.[$digit]+							 { \s -> TkReal (read s)}
@@ -35,6 +36,16 @@ data Token
 	| TkTipo String
 	| TkEnt Int
 	| TkReal Float
+=======
+	
+{
+
+data Token
+	= TkLine
+	|	TkTit String
+	| TkSecc String
+	| TkRes String
+>>>>>>> 17d9fddb30232c7ee6b2d071da5415dcaa3ac621
 
 	deriving Show
 
