@@ -1,0 +1,26 @@
+
+Titulo: Arbusto.
+
+Comentarios
+Ver el ejemplo 6 en el documento del enunciado del proyecto.
+
+Gramatica
+simbolo X
+simbolo F
+
+Condiciones
+pasos 7
+angulo 20
+posicion (0.0,0.0) 90
+
+matriz
+#X
+
+generatriz
+X ->
+#F--{&--#X}--#F--{$--#X}--&--#X
+
+F ->
+#F--#F
+
+Fin
