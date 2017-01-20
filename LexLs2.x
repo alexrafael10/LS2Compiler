@@ -19,7 +19,7 @@ $any = [.]
 tokens :-
 		\n														 				{ tok(\p s -> TkLin p)}
 		$white+                        				;
-		Titulo:\ $any*\.					 		 	 				{ tok(\p s -> TkTit p (take_title s))}
+		Titulo:\ $any*\.					 		 	 				{ tok(\p s -> TkTit p (tk2 s))}
 		Comentarios\n$any*\n 						 			;
 		Gramatica	| Condiciones | Fin					{ tok(\p s -> TkSecc p s)}
 		parametro | valor | simbolo |
@@ -59,9 +59,11 @@ data Token
 lexer :: String -> [Token]
 lexer s = alexScanTokens s
 
-take_title :: String -> String --Mejor opcion para esto(buscar)
-take_title (x:xs) = if (x == ':') then xs
-	else take_title(xs)
+tk1 :: String -> String --Tomar Espacios
+tk1 (x:xs) = if (x == ' ') then tk1(xs)	else x:xs
+
+tk2 :: String -> String --Tomar titulo hasta ':'
+tk2 x = tk1 (dropWhile (/= ' ') x)
 
 token_posn (TkLin p) = p
 token_posn (TkTit p _) = p
