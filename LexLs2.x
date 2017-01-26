@@ -10,32 +10,48 @@ module LexLs2 (
 
 %wrapper "posn"
 
-$digit  = [0-9]
-$letter = [a-zA-Z]
-$lower = [a-z]
-$upper = [A-Z]
-$any = [.]
+$digit  =           [0-9]
+$letter =           [a-zA-Z]
+$lower =            [a-z]
+$upper =            [A-Z]
+$any =              [.]
+
+@seccLine =         \n\n
+@title =            Titulo:\ $any*\.
+@comments =         Comentarios\n$any*\n
+@section =          Gramatica | Condiciones | Fin
+@keyword =          parametro | valor | simbolo |
+                    pasos | angulo | posicion | matriz |
+                    generatriz | probabilidad
+@dtype =            Real | Entero
+@int_const =        [$digit]+
+@float_const =      [$digit]+\.[$digit]+
+@par_id =           $lower[$digit $letter]*
+@sim_id =           $upper[$digit]*
+@sep_1 =            \( | \) | \, | \:
+@sep_2 =            \{ | \} | \-\- | \-\> | \:\=
+@mov =              \# | \@ | \$ | \&
+@oper =             \+ | \- | \* | \\ | \^
+@ord =              \< | \> | \=
 
 tokens :-
-  \n\n                                    { tok(\p s -> TkLin p)}
-  $white+                               ;
-  Titulo:\ $any*\.                      { tok(\p s -> TkTit p (tk2 s))}
-  Comentarios\n$any*\n                    ;
-  Gramatica | Condiciones | Fin         { tok(\p s -> TkSecc p s)}
-  parametro | valor | simbolo |
-  pasos | angulo | posicion | matriz |
-  generatriz | probabilidad             { tok(\p s -> TkRes p s)}
-  Real | Entero                         { tok(\p s -> TkTipo p s)}
-  [$digit]+                             { tok(\p s -> TkEnt p ( read s))}
-  [$digit]+\.[$digit]+                  { tok(\p s -> TkReal p (read s))}
-  $lower[$digit $letter]*               { tok(\p s -> TkIdPar p s)}
-  $upper[$digit]*                       { tok(\p s -> TkIdSim p s)}
-  \( | \) | \, | \:                     { tok(\p s -> TkSep1 p s)}
-  \{ | \} | \-\- | \-\> | \:\=          { tok(\p s -> TkSep2 p s)}
-  \# | \@ | \$ | \&                     { tok(\p s -> TkMov p s)}
-  \+ | \- | \* | \\ | \^                { tok(\p s -> TkOper p s)}
-  \< | \> | \=                          { tok(\p s -> TkOrd p s)}
-
+  @seccLine         { tok(\p s -> TkLin p)}
+  $white+           ;
+  @title            { tok(\p s -> TkTit p (tk2 s))}
+  @comments         ;
+  @section          { tok(\p s -> TkSecc p s)}
+  @keyword          { tok(\p s -> TkRes p s)}
+  @dtype            { tok(\p s -> TkTipo p s)}
+  @int_const        { tok(\p s -> TkEnt p ( read s))}
+  @float_const      { tok(\p s -> TkReal p (read s))}
+  @par_id           { tok(\p s -> TkIdPar p s)}
+  @sim_id           { tok(\p s -> TkIdSim p s)}
+  @sep_1            { tok(\p s -> TkSep1 p s)}
+  @sep_2            { tok(\p s -> TkSep2 p s)}
+  @mov              { tok(\p s -> TkMov p s)}
+  @oper             { tok(\p s -> TkOper p s)}
+  @ord              { tok(\p s -> TkOrd p s)}
+  .                 { tok(\p s -> TkErr p s)}
 {
 
 tok f p s = f p s
@@ -55,6 +71,7 @@ data Token
  | TkMov AlexPosn String
  | TkOper AlexPosn String
  | TkOrd AlexPosn String
+ | TkErr AlexPosn String
  deriving Show
 
 lexer :: String -> [Token]
@@ -80,4 +97,5 @@ token_posn (TkSep2 p _) = p
 token_posn (TkMov p _) = p
 token_posn (TkOper p _) = p
 token_posn (TkOrd p _) = p
+token_posn (TkErr p _) = p
 }

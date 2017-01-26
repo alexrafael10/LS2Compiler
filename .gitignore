@@ -1,0 +1,4 @@
+*.hi
+*.o
+*.txt
+LexLs2.hs
