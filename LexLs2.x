@@ -37,7 +37,7 @@ $any =              [.]
 tokens :-
   @seccLine         { tok(\p s -> TkLin p)}
   $white+           ;
-  @title            { tok(\p s -> TkTit p (tk2 s))}
+  @title            { tok(\p s -> TkTit p (take_title s))}
   @comments         ;
   @section          { tok(\p s -> TkSecc p s)}
   @keyword          { tok(\p s -> TkRes p s)}
@@ -77,11 +77,11 @@ data Token
 lexer :: String -> [Token]
 lexer s = alexScanTokens s
 
-tk1 :: String -> String --Tomar Espacios
-tk1 (x:xs) = if (x == ' ') then tk1(xs) else x:xs
+tk :: String -> String --Tomar Espacios restantes del titulo
+tk (x:xs) = if (x == ' ') then tk(xs) else x:xs
 
-tk2 :: String -> String --Tomar titulo hasta ' '
-tk2 x = dropWhile(/=' ') (dropWhile (/= ' ') x)
+take_title :: String -> String --Tomar titulo hasta ' '
+take_title x = tk (dropWhile (/= ' ') x)
 
 token_posn (TkLin p) = p
 token_posn (TkTit p _) = p

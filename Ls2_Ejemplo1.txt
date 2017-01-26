@@ -1,5 +1,5 @@
 
-Titulo: Isla de Koch.
+Titulo:            Isla de Koch.
 
 Comentarios
 Ver el ejemplo 5 en el documento del enunciado del proyecto.
