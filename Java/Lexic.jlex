@@ -42,7 +42,6 @@ class Token{
 %char
 %full
 %notunix
-%state MULTILINE
 
 %eofval{
     {System.out.printf("Success\n");
@@ -69,7 +68,7 @@ TKSIMID = {upper}({digit})*
 TKSEP1 = "("|")"|","|":"
 TKSEP2 = "{"|"}"|"--"|"->"|":="
 TKMOV = "#"|"@"|"$"|"&"
-TKOPER = "+"|"-"|"*"|"/"|\"^"
+TKOPER = "+"|"-"|"*"|"/"|"\^"
 TKORD = "<"|">"|"="
 WHITE = [" "\t\f\r]+
 
