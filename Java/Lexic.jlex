@@ -1,51 +1,18 @@
 // SECCION DE CODIGO DE USUARIO
 
-import java.util.*;
-import java.io.*;
 import java_cup.runtime.Symbol;
-
-class Lexic{
-    public static void main (String argv[]) throws java.io.IOException {
-        Yylex yy = new Yylex(System.in);
-        while (yy.yylex() != null) ;
-    }
-}
-
-class Yytoken{
-    Yytoken(){}
-}
-
-class Token{
-  int posX;
-  int posY;
-
-  String value;
-
-  public Token(String val, int x, int y){
-    this.value = val;
-    this.posX = x;
-    this.posY = y;
-  }
-
-  public int getX() { return this.posX; }
-  public int getY() { return this.posY; }
-  public String getValue() { return this.value;}
-
-}
 
 // SECCION DE DIRECTIVAS
 
 %%
 
-
+%cup
 %line
 %char
 %full
-%notunix
 
 %eofval{
-    {System.out.printf("Success\n");
-    System.exit(0);}
+    System.exit(0);
 %eofval}
 
 any = .
@@ -54,10 +21,10 @@ letter = [a-zA-Z]
 lower = [a-z]
 upper = [A-Z]
 
-NLINE = [\n]
-TKLIN = \n\n
+NLINE = [\r\n]
+TKLIN = \r\n\r\n
 TKTIT = ("Titulo:")({any})*(".")
-COMMENTS = ("Comentarios")({any})*(".")
+COMMENTS = ("Comentarios")(\r\n)({any})*(".")(\r\n)
 TKSECC = "Gramatica"|"Condiciones"|"Fin"
 TKKEYW = "parametro"|"valor"|"simbolo"|"pasos"|"angulo"|"posicion"|"matriz"|"generatriz"|"probabilidad"
 TKTYPE = "Entero"|"Real"
@@ -76,98 +43,97 @@ WHITE = [" "\t\f\r]+
 
 <YYINITIAL> {TKLIN}
 {
-   System.out.println("TKLIN:" + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKLIN,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKLIN:" + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKLIN);
 }
 
 <YYINITIAL> {WHITE} { }
 
 <YYINITIAL> {TKTIT}
 {
-   System.out.println("TKTIT:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKTIT,new Token(yytext(),yychar,yyline));
+    // System.out.println("TKTIT:" + yytext().replaceAll("\\s+","").substring(7) + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKTIT,new String(yytext().replaceAll("\\s+","").substring(7)));
 }
 
 <YYINITIAL> {COMMENTS} { }
 
 <YYINITIAL> {TKSECC}
 {
-   System.out.println("TKSECC:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKSECC,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKSECC:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKSECC,new String(yytext()));
 }
 
 <YYINITIAL> {TKKEYW}
 {
-   System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKKEYW,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKKEYW,new String(yytext()));
 }
 
 <YYINITIAL> {TKTYPE}
 {
-   System.out.println("TKTYPE:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKTYPE,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKTYPE:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKTYPE,new String(yytext()));
 }
 
 <YYINITIAL> {TKINT}
 {
-   System.out.println("TKINT:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKINT,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKINT:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKINT,new Integer(yytext()));
 }
 
 <YYINITIAL> {TKREAL}
 {
-   System.out.println("TKREAL:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKREAL,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKREAL:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKREAL,new Float(yytext()));
 }
 
 <YYINITIAL> {TKIDPAR}
 {
-   System.out.println("TKIDPAR:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKIDPAR,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKIDPAR:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKIDPAR,new String(yytext()));
 }
 
 <YYINITIAL> {TKSIMID}
 {
-   System.out.println("TKSIMID:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKSIMID,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKSIMID:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKSIMID,new String(yytext()));
 }
 
 <YYINITIAL> {TKSEP1}
 {
-   System.out.println("TKSEP1:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKSEP1,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKSEP1:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKSEP1,new String(yytext()));
 }
 
 <YYINITIAL> {TKSEP2}
 {
-   System.out.println("TKSEP2:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKSEP2,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKSEP2:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKSEP2,new String(yytext()));
 }
 
 <YYINITIAL> {TKMOV}
 {
-   System.out.println("TKMOV:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKMOV,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKMOV:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKMOV,new String(yytext()));
 }
 
 <YYINITIAL> {TKOPER}
 {
-   System.out.println("TKOPER:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKOPER,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKOPER:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKOPER,new String(yytext()));
 }
 
 <YYINITIAL> {TKORD}
 {
-   System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
-   //return new Symbol(sym.TKORD,new Token(yytext(),yychar,yyline));
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return new Symbol(sym.TKORD,new String(yytext()));
 }
 
 <YYINITIAL> {NLINE} { }
 
 <YYINITIAL> .
 {
-    System.out.println("Error lexico initial en <" + yyline + " , " + yychar +
-        "> no se reconoce " + yytext());
-    yychar = 0;
-      return null;
+    System.out.println("Error lexico en Linea:" + yyline + " , Caracter" + yychar +
+        "- no se reconoce " + yytext());
+        // return null;
 }
