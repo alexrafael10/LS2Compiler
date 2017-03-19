@@ -1,0 +1,31 @@
+import java_cup.runtime.*;
+
+parser code {:
+    public static void main(String args[]) throws Exception {
+        // La clase Yylex es creada por el analizador l�xico
+        new parser(new Yylex(System.in)).parse();
+    }
+:}
+
+terminal TKLIN,
+        TKTIT,
+        TKSECC,
+        TKKEYW,
+        TKTYPE,
+        TKIDPAR,
+        TKSIMID,
+        TKSEP1,
+        TKSEP2,
+        TKMOV,
+        TKOPER,
+        TKORD;
+
+
+terminal Integer TKINT;
+terminal Float TKREAL;
+
+/* Lista de no terminales. */
+
+non terminal Program;
+
+Program ::= TKTIT TKSECC TKSECC TKSECC;

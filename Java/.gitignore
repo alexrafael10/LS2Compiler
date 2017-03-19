@@ -4,3 +4,4 @@ JLex
 *.jlex.java
 parser.java
 sym.java
+*.txt
