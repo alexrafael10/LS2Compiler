@@ -1,0 +1,19 @@
+
+Titulo:            Isla de Koch.
+
+Gramatica
+simbolo F
+
+Condiciones
+pasos 4
+angulo 90
+posicion (0.0,0.0) 90
+
+matriz
+#F--$--#F--$--#F--$--#F
+
+generatriz
+F ->
+#F--$--#F--&--#F--&--#F--#F--$--#F--$--#F--&--#F
+
+Fin

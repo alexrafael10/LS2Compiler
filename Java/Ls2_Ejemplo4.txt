@@ -1,0 +1,28 @@
+
+Titulo: Arbusto estocastico.
+
+Gramatica
+simbolo F
+
+Condiciones
+pasos 10
+angulo 30
+posicion (0.0,0.0) 90
+
+matriz
+#F
+
+generatriz
+F ->
+probabilidad 0.33
+#F--{&--#F}--#F--{$--#F}--#F
+
+F ->
+probabilidad 0.33
+#F--{&--#F}--#F
+
+F ->
+probabilidad 0.34
+#F--{$--#F}--#F
+
+Fin
