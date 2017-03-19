@@ -14,10 +14,10 @@ parser code {:
   	public void syntax_error(Symbol actual) {
   		if (actual.sym == sym.EOF)
   			report_error("Intruccion incompleta en linea : "+InformacionCodigo.linea+
-  				       " Token : "+InformacionCodigo.token);
+  				       " Caracter: "+ InformacionCodigo.caracter + " Token : "+InformacionCodigo.token);
   		else
   			report_error("Error sintactico en linea : "+InformacionCodigo.linea+
-  				       " Token : "+InformacionCodigo.token);
+  				       " Caracter: "+ InformacionCodigo.caracter + " Token : "+InformacionCodigo.token);
   	}
 
   	// Muestra el texto de un error irrecuperable
@@ -86,22 +86,25 @@ terminal String TKSIMID;
 /* Lista de no terminales. */
 
 non terminal Program,Tittle,Gram_sect,Gram_body,Param_list,Param,Expr
-            ,Simbol_list,Simbol,Simbol_param_list,Simbol_param,Cond_sect,Cond_body
+            ,Simbol_list,Simbol,Simbol_param_list,Cond_sect,Cond_body
             ,Cond_pasos,Cond_angul,Cond_posicion,Cond_pos_punto,Cond_pos_angul
             ,Cond_matriz,Mov_list,Matriz_mov,Mov_d,Mov_nd,Mov_r,Mov_l,Mov_simbol
-            ,Mov_simbol_param_list,Cond_gener,Gener_list,Gener,Gener_NP,Gener_P,Expr_logic;
+            ,Mov_simbol_param_list,Cond_gener,Gener_list,Gener,Gener_NP,Gener_P,Expr_logic,
+            Comp_int,Comp_real;
 
 precedence left TKASSIGN;
-precedence left TKLOG_AND, TKLOG_OR, TKLOG_DIF;
-precedence left TKORD_E,TKORD_L, TKORD_R;
+precedence left TKLOG_AND,TKLOG_OR,TKLOG_DIF;
+precedence left TKORD_E,TKORD_L,TKORD_R;
 precedence left TKEXP;
-precedence left TKPLUS, TKMIN;
-precedence left TKTIMES, TKDIV;
-precedence left TKPAR_O, TKPAR_C;
+precedence left TKPLUS,TKMIN;
+precedence left TKTIMES,TKDIV;
+precedence left TKPAR_O,TKPAR_C;
+precedence left TKDLINE;
+precedence left TKBRAC_O,TKBRAC_C;
 
 start with Program;
 
-Program ::= Tittle TKLIN Gram_sect TKLIN Cond_sect TKLIN TKSECC_FIN;
+Program ::= Tittle TKLIN Gram_sect TKLIN Cond_sect TKSECC_FIN;
 
 Tittle ::= TKTIT;
 
@@ -137,17 +140,18 @@ Cond_angul ::= TKKEYW_ANGUL TKINT;
 
 Cond_posicion ::= TKKEYW_POSIC Cond_pos_punto Cond_pos_angul;
 
-Cond_pos_punto ::= TKPAR_O TKREAL TKCOMA TKREAL TKPAR_C;
+Cond_pos_punto ::= TKPAR_O Comp_real TKCOMA Comp_real TKPAR_C;
 
 Cond_pos_angul ::= TKINT;
 
 Cond_matriz ::= TKKEYW_MATRI Mov_list;
 
-Mov_list ::= Mov_list TKDLINE Matriz_mov
-           | TKBRAC_O Mov_list TKBRAC_C
+Mov_list ::= Mov_list Matriz_mov
            | Matriz_mov;
 
-Matriz_mov ::= Mov_d
+Matriz_mov ::= Matriz_mov TKDLINE Matriz_mov
+             | TKBRAC_O Matriz_mov TKBRAC_C
+             | Mov_d
              | Mov_nd
              | Mov_r
              | Mov_l;
@@ -168,13 +172,13 @@ Cond_gener ::= TKKEYW_GENER Gener_list;
 Gener_list ::= Gener_list Gener
              | Gener;
 
-Gener ::= Gener_NP
-        | Gener_P;
+Gener ::= Gener_NP TKLIN
+        | Gener_P TKLIN;
 
-Gener_NP ::= Mov_simbol TKDDOT Expr TKARRW Mov_list
+Gener_NP ::= Mov_simbol TKDDOT Expr_logic TKARRW Mov_list
            | Mov_simbol TKARRW Mov_list;
 
-Gener_P ::= Gener_NP TKKEYW_PROBA TKREAL Mov_list;
+Gener_P ::= Mov_simbol TKARRW TKKEYW_PROBA TKREAL Mov_list;
 
 Expr ::= Expr TKPLUS Expr
             | Expr TKMIN Expr
@@ -196,4 +200,9 @@ Expr_logic ::= Expr_logic TKORD_L Expr_logic
             | TKPAR_O Expr_logic TKPAR_C
             | TKFALSE
             | TKTRUE
+            | TKINT
+            | TKREAL
             | TKIDPAR;
+
+Comp_real ::= TKMIN TKREAL
+          | TKREAL;
