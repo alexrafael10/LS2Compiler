@@ -1,19 +1,38 @@
 // SECCION DE CODIGO DE USUARIO
 
 import java_cup.runtime.Symbol;
+import java.lang.System;
+import java.io.*;
 
 // SECCION DE DIRECTIVAS
 
 %%
 
-%cup
-%line
-%char
 %full
-
+%unicode
+%line
+%cup
+%char
 %eofval{
-    System.exit(0);
+	{ return Token(sym.EOF); }
 %eofval}
+
+%{
+	String tok = "";
+
+	private Symbol Token(int token, Object lexema) throws IOException {
+		int linea = yyline + 1;
+		tok = (String)lexema;
+		if (token != sym.EOF)
+			InformacionCodigo.guardarInformacionCodigo(linea,tok);
+		return new Symbol(token, lexema);
+	}
+
+	private Symbol Token(int token) throws IOException {
+		return Token(token, yytext());
+	}
+
+%}
 
 any = .
 digit = [0-9]
@@ -25,18 +44,45 @@ NLINE = [\r\n]
 TKLIN = \r\n\r\n
 TKTIT = ("Titulo:")({any})*(".")
 COMMENTS = ("Comentarios")(\r\n)({any})*(".")(\r\n)
-TKSECC = "Gramatica"|"Condiciones"|"Fin"
-TKKEYW = "parametro"|"valor"|"simbolo"|"pasos"|"angulo"|"posicion"|"matriz"|"generatriz"|"probabilidad"
-TKTYPE = "Entero"|"Real"
+TKSECC_GRAM = "Gramatica"
+TKSECC_COND = "Condiciones"
+TKSECC_FIN = "Fin"
+TKKEYW_PARAM = "parametro"
+TKKEYW_VALOR = "valor"
+TKKEYW_SIMBO = "simbolo"
+TKKEYW_PASOS = "pasos"
+TKKEYW_ANGUL = "angulo"
+TKKEYW_POSIC = "posicion"
+TKKEYW_MATRI = "matriz"
+TKKEYW_GENER = "generatriz"
+TKKEYW_PROBA = "probabilidad"
+TKTYPE_ENT = "Entero"
+TKTYPE_REAL = "Real"
 TKINT = ({digit})+
 TKREAL = ({digit})+["."]({digit})+
 TKIDPAR = {lower}({digit}|{letter})*
 TKSIMID = {upper}({digit})*
-TKSEP1 = "("|")"|","|":"
-TKSEP2 = "{"|"}"|"--"|"->"|":="
-TKMOV = "#"|"@"|"$"|"&"
-TKOPER = "+"|"-"|"*"|"/"|"\^"
-TKORD = "<"|">"|"="
+TKPAR_O = "("
+TKPAR_C = ")"
+TKCOMA = ","
+TKDDOT = ":"
+TKBRAC_O = "{"
+TKBRAC_C = "}"
+TKDLINE = "--"
+TKARRW = "->"
+TKASSIGN = ":="
+TKMOVD = "#"
+TKMOVND = "@"
+TKMOVR = "$"
+TKMOVL = "&"
+TKPLUS = "+"
+TKMIN = "-"
+TKTIMES = "*"
+TKDIV = "/"
+TKEXP = "\^"
+TKORD_L = "<"
+TKORD_R = ">"
+TKORD_E = "="
 WHITE = [" "\t\f\r]+
 
 %%
@@ -44,7 +90,7 @@ WHITE = [" "\t\f\r]+
 <YYINITIAL> {TKLIN}
 {
   //  System.out.println("TKLIN:" + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKLIN);
+   return Token(sym.TKLIN);
 }
 
 <YYINITIAL> {WHITE} { }
@@ -52,88 +98,250 @@ WHITE = [" "\t\f\r]+
 <YYINITIAL> {TKTIT}
 {
     // System.out.println("TKTIT:" + yytext().replaceAll("\\s+","").substring(7) + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKTIT,new String(yytext().replaceAll("\\s+","").substring(7)));
+   return Token(sym.TKTIT,yytext().replaceAll("\\s+","").substring(7));
 }
 
 <YYINITIAL> {COMMENTS} { }
 
-<YYINITIAL> {TKSECC}
+<YYINITIAL> {TKSECC_GRAM}
 {
   //  System.out.println("TKSECC:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKSECC,new String(yytext()));
+   return Token(sym.TKSECC_GRAM);
 }
 
-<YYINITIAL> {TKKEYW}
+<YYINITIAL> {TKSECC_COND}
+{
+  //  System.out.println("TKSECC:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKSECC_COND);
+}
+
+<YYINITIAL> {TKSECC_FIN}
+{
+  //  System.out.println("TKSECC:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKSECC_FIN);
+}
+
+<YYINITIAL> {TKKEYW_PARAM}
 {
   //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKKEYW,new String(yytext()));
+   return Token(sym.TKKEYW_PARAM);
 }
 
-<YYINITIAL> {TKTYPE}
+<YYINITIAL> {TKKEYW_VALOR}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_VALOR);
+}
+
+<YYINITIAL> {TKKEYW_SIMBO}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_SIMBO);
+}
+
+<YYINITIAL> {TKKEYW_PASOS}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_PASOS);
+}
+
+<YYINITIAL> {TKKEYW_ANGUL}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_ANGUL);
+}
+
+<YYINITIAL> {TKKEYW_POSIC}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_POSIC);
+}
+
+<YYINITIAL> {TKKEYW_MATRI}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_MATRI);
+}
+
+<YYINITIAL> {TKKEYW_GENER}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_GENER);
+}
+
+<YYINITIAL> {TKKEYW_PROBA}
+{
+  //  System.out.println("TKKEYW:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKKEYW_PROBA);
+}
+
+<YYINITIAL> {TKTYPE_ENT}
 {
   //  System.out.println("TKTYPE:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKTYPE,new String(yytext()));
+   return Token(sym.TKTYPE_ENT);
+}
+
+<YYINITIAL> {TKTYPE_REAL}
+{
+  //  System.out.println("TKTYPE:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKTYPE_REAL);
 }
 
 <YYINITIAL> {TKINT}
 {
   //  System.out.println("TKINT:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKINT,new Integer(yytext()));
+   return Token(sym.TKINT,yytext());
 }
 
 <YYINITIAL> {TKREAL}
 {
   //  System.out.println("TKREAL:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKREAL,new Float(yytext()));
+   return Token(sym.TKREAL,yytext());
 }
 
 <YYINITIAL> {TKIDPAR}
 {
   //  System.out.println("TKIDPAR:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKIDPAR,new String(yytext()));
+   return Token(sym.TKIDPAR,yytext());
 }
 
 <YYINITIAL> {TKSIMID}
 {
   //  System.out.println("TKSIMID:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKSIMID,new String(yytext()));
+   return Token(sym.TKSIMID,yytext());
 }
 
-<YYINITIAL> {TKSEP1}
+<YYINITIAL> {TKPAR_O}
 {
   //  System.out.println("TKSEP1:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKSEP1,new String(yytext()));
+   return Token(sym.TKPAR_O);
 }
 
-<YYINITIAL> {TKSEP2}
+<YYINITIAL> {TKPAR_C}
 {
   //  System.out.println("TKSEP2:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKSEP2,new String(yytext()));
+   return Token(sym.TKPAR_C);
 }
 
-<YYINITIAL> {TKMOV}
+<YYINITIAL> {TKCOMA}
 {
   //  System.out.println("TKMOV:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKMOV,new String(yytext()));
+   return Token(sym.TKCOMA);
 }
 
-<YYINITIAL> {TKOPER}
+<YYINITIAL> {TKDDOT}
 {
   //  System.out.println("TKOPER:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKOPER,new String(yytext()));
+   return Token(sym.TKDDOT);
 }
 
-<YYINITIAL> {TKORD}
+<YYINITIAL> {TKBRAC_O}
 {
   //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return new Symbol(sym.TKORD,new String(yytext()));
+   return Token(sym.TKBRAC_O);
+}
+
+<YYINITIAL> {TKBRAC_C}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKBRAC_C);
+}
+
+<YYINITIAL> {TKDLINE}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKDLINE);
+}
+
+<YYINITIAL> {TKARRW}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKARRW);
+}
+
+<YYINITIAL> {TKASSIGN}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKASSIGN);
+}
+
+<YYINITIAL> {TKMOVD}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKMOVD);
+}
+
+<YYINITIAL> {TKMOVND}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKMOVND);
+}
+
+<YYINITIAL> {TKMOVR}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKMOVR);
+}
+
+<YYINITIAL> {TKMOVL}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKMOVL);
+}
+
+<YYINITIAL> {TKPLUS}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKPLUS);
+}
+
+<YYINITIAL> {TKMIN}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKMIN);
+}
+
+<YYINITIAL> {TKTIMES}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKTIMES);
+}
+
+<YYINITIAL> {TKDIV}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKDIV);
+}
+
+<YYINITIAL> {TKEXP}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKEXP);
+}
+
+<YYINITIAL> {TKORD_L}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKORD_L);
+}
+
+<YYINITIAL> {TKORD_R}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKORD_R);
+}
+
+<YYINITIAL> {TKORD_E}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKORD_E);
 }
 
 <YYINITIAL> {NLINE} { }
 
 <YYINITIAL> .
 {
-    System.out.println("Error lexico en Linea:" + yyline + " , Caracter" + yychar +
+    System.err.println("Error lexico en Linea:" + yyline + " , Caracter" + yychar +
         "- no se reconoce " + yytext());
         // return null;
 }

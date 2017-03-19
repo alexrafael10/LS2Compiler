@@ -5,27 +5,94 @@ parser code {:
         // La clase Yylex es creada por el analizador l�xico
         new parser(new Yylex(System.in)).parse();
     }
+
+    public void report_error(String message) {
+  		System.err.println(message);
+  	}
+
+  	// Muestra un error de sintaxis
+  	public void syntax_error(Symbol actual) {
+  		if (actual.sym == sym.EOF)
+  			report_error("Intruccion incompleta en linea : "+InformacionCodigo.linea+
+  				       " Token : "+InformacionCodigo.token);
+  		else
+  			report_error("Error sintactico en linea : "+InformacionCodigo.linea+
+  				       " Token : "+InformacionCodigo.token);
+  	}
+
+  	// Muestra el texto de un error irrecuperable
+  	public void report_fatal_error(String message, Object info) {
+  		System.err.println(message);
+  	}
+
+  	// Muestra un mensaje cuando no se puede seguir analizando
+  	public void unrecovered_syntax_error(Symbol actual) {
+  	}
+
+  	//Muestra un mensaje de error con linea, token y mensaje
+  	public void error(String mensaje) {
+  		report_error("ERROR -> Linea: "+InformacionCodigo.linea+" Lexema: "+InformacionCodigo.token+" "+mensaje);
+  	}
 :}
 
-terminal TKLIN,
-        TKTIT,
-        TKSECC,
-        TKKEYW,
-        TKTYPE,
-        TKIDPAR,
-        TKSIMID,
-        TKSEP1,
-        TKSEP2,
-        TKMOV,
-        TKOPER,
-        TKORD;
+terminal TKLIN
+        ,TKSECC_GRAM
+        ,TKSECC_COND
+        ,TKSECC_FIN
+        ,TKKEYW_PARAM
+        ,TKKEYW_VALOR
+        ,TKKEYW_SIMBO
+        ,TKKEYW_PASOS
+        ,TKKEYW_ANGUL
+        ,TKKEYW_POSIC
+        ,TKKEYW_MATRI
+        ,TKKEYW_GENER
+        ,TKKEYW_PROBA
+        ,TKTYPE_ENT
+        ,TKTYPE_REAL
+        ,TKPAR_O
+        ,TKPAR_C
+        ,TKCOMA
+        ,TKDDOT
+        ,TKBRAC_O
+        ,TKBRAC_C
+        ,TKDLINE
+        ,TKARRW
+        ,TKASSIGN
+        ,TKMOVD
+        ,TKMOVND
+        ,TKMOVR
+        ,TKMOVL
+        ,TKPLUS
+        ,TKMIN
+        ,TKTIMES
+        ,TKDIV
+        ,TKEXP
+        ,TKORD_L
+        ,TKORD_R
+        ,TKORD_E;
 
 
+terminal String TKTIT;
 terminal Integer TKINT;
 terminal Float TKREAL;
+terminal String TKIDPAR;
+terminal String TKSIMID;
 
 /* Lista de no terminales. */
 
-non terminal Program;
+non terminal Program,Tittle,Gram_sect,Gram_body,Param_list,Param,Expr_int,Expr_real;
 
-Program ::= TKTIT TKSECC TKSECC TKSECC;
+Program ::= Tittle TKLIN Gram_sect TKLIN TKSECC_COND TKLIN TKSECC_FIN;
+
+Tittle ::= TKTIT;
+
+Gram_sect ::= TKSECC_GRAM Gram_body;
+
+Gram_body ::= Param_list;
+
+Param_list ::= Param_list Param
+             | Param;
+
+Param ::= TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_ENT TKKEYW_VALOR TKINT
+        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKKEYW_VALOR TKREAL;
