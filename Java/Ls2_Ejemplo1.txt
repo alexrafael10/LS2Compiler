@@ -1,9 +1,0 @@
-Titulo: Triangulo rectangulo.
-
-Gramatica
-parametro c:Real valor 1.0
-parametro p:Real valor 0.3
-
-Condiciones
-
-Fin

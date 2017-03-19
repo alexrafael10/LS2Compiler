@@ -72,7 +72,6 @@ terminal TKLIN
         ,TKORD_R
         ,TKORD_E;
 
-
 terminal String TKTIT;
 terminal Integer TKINT;
 terminal Float TKREAL;
@@ -81,7 +80,17 @@ terminal String TKSIMID;
 
 /* Lista de no terminales. */
 
-non terminal Program,Tittle,Gram_sect,Gram_body,Param_list,Param,Expr_int,Expr_real;
+non terminal Program,Tittle,Gram_sect,Gram_body,Param_list,Param,Expr_int,Expr_real
+            ,Simbol_list,Simbol,Simbol_param_list,Simbol_param;
+
+precedence left TKASSIGN;
+precedence left TKORD_E,TKORD_L, TKORD_R;
+precedence left TKEXP;
+precedence left TKPLUS, TKMIN;
+precedence left TKTIMES, TKDIV;
+precedence left TKPAR_O, TKPAR_C;
+
+start with Program;
 
 Program ::= Tittle TKLIN Gram_sect TKLIN TKSECC_COND TKLIN TKSECC_FIN;
 
@@ -89,10 +98,41 @@ Tittle ::= TKTIT;
 
 Gram_sect ::= TKSECC_GRAM Gram_body;
 
-Gram_body ::= Param_list;
+Gram_body ::= Param_list Simbol_list
+            | Param_list
+            | Simbol_list;
 
 Param_list ::= Param_list Param
              | Param;
 
 Param ::= TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_ENT TKKEYW_VALOR TKINT
-        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKKEYW_VALOR TKREAL;
+        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKKEYW_VALOR TKREAL
+        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKASSIGN Expr_real
+        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_ENT TKASSIGN Expr_int;
+
+Simbol_list ::= Simbol_list Simbol
+              | Simbol;
+
+Simbol ::= TKKEYW_SIMBO TKSIMID TKPAR_O Simbol_param_list TKPAR_C
+         | TKKEYW_SIMBO TKSIMID;
+
+Simbol_param_list ::= Simbol_param_list TKCOMA TKIDPAR
+                    | TKIDPAR;
+
+Expr_real ::= Expr_real TKPLUS Expr_real
+            | Expr_real TKMIN Expr_real
+            | Expr_real TKTIMES Expr_real
+            | Expr_real TKDIV Expr_real
+            | Expr_real TKEXP Expr_real
+            | TKREAL
+            | TKIDPAR
+            | TKPAR_O Expr_real TKPAR_C;
+
+Expr_int ::= Expr_int TKPLUS Expr_int
+           | Expr_int TKMIN Expr_int
+           | Expr_int TKTIMES Expr_int
+           | Expr_int TKDIV Expr_int
+           | Expr_int TKEXP Expr_int
+           | TKINT
+           | TKIDPAR
+           | TKPAR_O Expr_int TKPAR_C;
