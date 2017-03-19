@@ -79,10 +79,16 @@ TKPLUS = "+"
 TKMIN = "-"
 TKTIMES = "*"
 TKDIV = "/"
-TKEXP = "\^"
+TKEXP = \x5E
 TKORD_L = "<"
 TKORD_R = ">"
 TKORD_E = "="
+TKLOG_AND = \\"/"
+TKLOG_OR = "/"\\
+TKLOG_DIF = "~"
+TKTRUE = "true"
+TKFALSE = "false"
+
 WHITE = [" "\t\f\r]+
 
 %%
@@ -335,6 +341,36 @@ WHITE = [" "\t\f\r]+
 {
   //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
    return Token(sym.TKORD_E);
+}
+
+<YYINITIAL> {TKLOG_AND}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKLOG_AND);
+}
+
+<YYINITIAL> {TKLOG_OR}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKLOG_OR);
+}
+
+<YYINITIAL> {TKLOG_DIF}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKLOG_DIF);
+}
+
+<YYINITIAL> {TKTRUE}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKTRUE);
+}
+
+<YYINITIAL> {TKFALSE}
+{
+  //  System.out.println("TKORD:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKFALSE);
 }
 
 <YYINITIAL> {NLINE} { }
