@@ -22,9 +22,10 @@ import java.io.*;
 
 	private Symbol Token(int token, Object lexema) throws IOException {
 		int linea = yyline + 1;
+    int caracter = yychar +1;
 		tok = (String)lexema;
 		if (token != sym.EOF)
-			InformacionCodigo.guardarInformacionCodigo(linea,tok);
+			InformacionCodigo.guardarInformacionCodigo(linea,caracter,tok);
 		return new Symbol(token, lexema);
 	}
 
@@ -99,7 +100,7 @@ WHITE = [" "\t\f\r]+
    return Token(sym.TKLIN);
 }
 
-<YYINITIAL> {WHITE} { }
+<YYINITIAL> {WHITE} { yychar = 0; }
 
 <YYINITIAL> {TKTIT}
 {
@@ -107,7 +108,19 @@ WHITE = [" "\t\f\r]+
    return Token(sym.TKTIT,yytext().replaceAll("\\s+","").substring(7));
 }
 
-<YYINITIAL> {COMMENTS} { }
+<YYINITIAL> {COMMENTS} { yychar = 0; }
+
+<YYINITIAL> {TKINT}
+{
+  //  System.out.println("TKINT:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKINT,yytext());
+}
+
+<YYINITIAL> {TKREAL}
+{
+  //  System.out.println("TKREAL:" + yytext() + " char: " +yychar+" line: " +yyline);
+   return Token(sym.TKREAL,yytext());
+}
 
 <YYINITIAL> {TKSECC_GRAM}
 {
@@ -191,18 +204,6 @@ WHITE = [" "\t\f\r]+
 {
   //  System.out.println("TKTYPE:" + yytext() + " char: " +yychar+" line: " +yyline);
    return Token(sym.TKTYPE_REAL);
-}
-
-<YYINITIAL> {TKINT}
-{
-  //  System.out.println("TKINT:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return Token(sym.TKINT,yytext());
-}
-
-<YYINITIAL> {TKREAL}
-{
-  //  System.out.println("TKREAL:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return Token(sym.TKREAL,yytext());
 }
 
 <YYINITIAL> {TKIDPAR}
@@ -373,7 +374,7 @@ WHITE = [" "\t\f\r]+
    return Token(sym.TKFALSE);
 }
 
-<YYINITIAL> {NLINE} { }
+<YYINITIAL> {NLINE} {  }
 
 <YYINITIAL> .
 {
