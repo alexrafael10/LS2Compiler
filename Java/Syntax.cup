@@ -70,7 +70,12 @@ terminal TKLIN
         ,TKEXP
         ,TKORD_L
         ,TKORD_R
-        ,TKORD_E;
+        ,TKORD_E
+        ,TKLOG_AND
+        ,TKLOG_OR
+        ,TKLOG_DIF
+        ,TKTRUE
+        ,TKFALSE;
 
 terminal String TKTIT;
 terminal Integer TKINT;
@@ -80,10 +85,14 @@ terminal String TKSIMID;
 
 /* Lista de no terminales. */
 
-non terminal Program,Tittle,Gram_sect,Gram_body,Param_list,Param,Expr_int,Expr_real
-            ,Simbol_list,Simbol,Simbol_param_list,Simbol_param;
+non terminal Program,Tittle,Gram_sect,Gram_body,Param_list,Param,Expr
+            ,Simbol_list,Simbol,Simbol_param_list,Simbol_param,Cond_sect,Cond_body
+            ,Cond_pasos,Cond_angul,Cond_posicion,Cond_pos_punto,Cond_pos_angul
+            ,Cond_matriz,Mov_list,Matriz_mov,Mov_d,Mov_nd,Mov_r,Mov_l,Mov_simbol
+            ,Mov_simbol_param_list,Cond_gener,Gener_list,Gener,Gener_NP,Gener_P,Expr_logic;
 
 precedence left TKASSIGN;
+precedence left TKLOG_AND, TKLOG_OR, TKLOG_DIF;
 precedence left TKORD_E,TKORD_L, TKORD_R;
 precedence left TKEXP;
 precedence left TKPLUS, TKMIN;
@@ -92,7 +101,7 @@ precedence left TKPAR_O, TKPAR_C;
 
 start with Program;
 
-Program ::= Tittle TKLIN Gram_sect TKLIN TKSECC_COND TKLIN TKSECC_FIN;
+Program ::= Tittle TKLIN Gram_sect TKLIN Cond_sect TKLIN TKSECC_FIN;
 
 Tittle ::= TKTIT;
 
@@ -107,8 +116,7 @@ Param_list ::= Param_list Param
 
 Param ::= TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_ENT TKKEYW_VALOR TKINT
         | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKKEYW_VALOR TKREAL
-        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKASSIGN Expr_real
-        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_ENT TKASSIGN Expr_int;
+        | TKKEYW_PARAM TKIDPAR TKDDOT TKTYPE_REAL TKASSIGN Expr;
 
 Simbol_list ::= Simbol_list Simbol
               | Simbol;
@@ -119,20 +127,73 @@ Simbol ::= TKKEYW_SIMBO TKSIMID TKPAR_O Simbol_param_list TKPAR_C
 Simbol_param_list ::= Simbol_param_list TKCOMA TKIDPAR
                     | TKIDPAR;
 
-Expr_real ::= Expr_real TKPLUS Expr_real
-            | Expr_real TKMIN Expr_real
-            | Expr_real TKTIMES Expr_real
-            | Expr_real TKDIV Expr_real
-            | Expr_real TKEXP Expr_real
+Cond_sect ::= TKSECC_COND Cond_body;
+
+Cond_body ::= Cond_pasos Cond_angul Cond_posicion TKLIN Cond_matriz TKLIN Cond_gener;
+
+Cond_pasos ::= TKKEYW_PASOS TKINT;
+
+Cond_angul ::= TKKEYW_ANGUL TKINT;
+
+Cond_posicion ::= TKKEYW_POSIC Cond_pos_punto Cond_pos_angul;
+
+Cond_pos_punto ::= TKPAR_O TKREAL TKCOMA TKREAL TKPAR_C;
+
+Cond_pos_angul ::= TKINT;
+
+Cond_matriz ::= TKKEYW_MATRI Mov_list;
+
+Mov_list ::= Mov_list TKDLINE Matriz_mov
+           | TKBRAC_O Mov_list TKBRAC_C
+           | Matriz_mov;
+
+Matriz_mov ::= Mov_d
+             | Mov_nd
+             | Mov_r
+             | Mov_l;
+
+Mov_d ::= TKMOVD Mov_simbol;
+Mov_nd ::= TKMOVND Mov_simbol;
+Mov_r ::= TKMOVR;
+Mov_l ::= TKMOVL;
+
+Mov_simbol ::= TKSIMID TKPAR_O Mov_simbol_param_list TKPAR_C
+         | TKSIMID;
+
+Mov_simbol_param_list ::= Mov_simbol_param_list TKCOMA Expr
+                    | Expr;
+
+Cond_gener ::= TKKEYW_GENER Gener_list;
+
+Gener_list ::= Gener_list Gener
+             | Gener;
+
+Gener ::= Gener_NP
+        | Gener_P;
+
+Gener_NP ::= Mov_simbol TKDDOT Expr TKARRW Mov_list
+           | Mov_simbol TKARRW Mov_list;
+
+Gener_P ::= Gener_NP TKKEYW_PROBA TKREAL Mov_list;
+
+Expr ::= Expr TKPLUS Expr
+            | Expr TKMIN Expr
+            | Expr TKTIMES Expr
+            | Expr TKDIV Expr
+            | Expr TKEXP Expr
+            | TKMIN Expr
+            | TKINT
             | TKREAL
             | TKIDPAR
-            | TKPAR_O Expr_real TKPAR_C;
+            | TKPAR_O Expr TKPAR_C;
 
-Expr_int ::= Expr_int TKPLUS Expr_int
-           | Expr_int TKMIN Expr_int
-           | Expr_int TKTIMES Expr_int
-           | Expr_int TKDIV Expr_int
-           | Expr_int TKEXP Expr_int
-           | TKINT
-           | TKIDPAR
-           | TKPAR_O Expr_int TKPAR_C;
+Expr_logic ::= Expr_logic TKORD_L Expr_logic
+            | Expr_logic TKORD_R Expr_logic
+            | Expr_logic TKORD_E Expr_logic
+            | Expr_logic TKLOG_AND Expr_logic
+            | Expr_logic TKLOG_OR Expr_logic
+            | Expr_logic TKLOG_DIF Expr_logic
+            | TKPAR_O Expr_logic TKPAR_C
+            | TKFALSE
+            | TKTRUE
+            | TKIDPAR;
