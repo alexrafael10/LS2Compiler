@@ -23,7 +23,25 @@ import java.io.*;
 	private Symbol Token(int token, Object lexema) throws IOException {
 		int linea = yyline + 1;
     int caracter = yychar +1;
-		tok = (String)lexema;
+		tok = (String) lexema;
+		if (token != sym.EOF)
+			InformacionCodigo.guardarInformacionCodigo(linea,caracter,tok);
+		return new Symbol(token, lexema);
+	}
+
+  private Symbol Token(int token, int lexema) throws IOException {
+		int linea = yyline + 1;
+    int caracter = yychar +1;
+		tok = String.valueOf(lexema);
+		if (token != sym.EOF)
+			InformacionCodigo.guardarInformacionCodigo(linea,caracter,tok);
+		return new Symbol(token, lexema);
+	}
+
+  private Symbol Token(int token, double lexema) throws IOException {
+		int linea = yyline + 1;
+    int caracter = yychar +1;
+		tok = String.valueOf(lexema);
 		if (token != sym.EOF)
 			InformacionCodigo.guardarInformacionCodigo(linea,caracter,tok);
 		return new Symbol(token, lexema);
@@ -113,13 +131,13 @@ WHITE = [" "\t\f\r]+
 <YYINITIAL> {TKINT}
 {
   //  System.out.println("TKINT:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return Token(sym.TKINT,yytext());
+   return Token(sym.TKINT,Integer.parseInt(yytext()));
 }
 
 <YYINITIAL> {TKREAL}
 {
   //  System.out.println("TKREAL:" + yytext() + " char: " +yychar+" line: " +yyline);
-   return Token(sym.TKREAL,yytext());
+   return Token(sym.TKREAL,Double.parseDouble(yytext()));
 }
 
 <YYINITIAL> {TKSECC_GRAM}
