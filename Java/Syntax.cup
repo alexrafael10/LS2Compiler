@@ -149,28 +149,31 @@ Gram_body ::= Param_list Simbol_list
 Param_list ::= Param_list Param
              | Param;
 
-Param ::= TKKEYW_PARAM TKIDPAR:id TKDDOT TKTYPE_ENT TKKEYW_VALOR TKINT
+Param ::= TKKEYW_PARAM TKIDPAR:id TKDDOT TKTYPE_ENT TKKEYW_VALOR TKINT:value
           {:
             if(existeSimbolo(id)) {
               parser.error("Parametro " + id + " redefinido");
             } else {
               addSimbolo(id);
+							RESULT = value;
             }
           :}
-        | TKKEYW_PARAM TKIDPAR:id TKDDOT TKTYPE_REAL TKKEYW_VALOR TKREAL
+        | TKKEYW_PARAM TKIDPAR:id TKDDOT TKTYPE_REAL TKKEYW_VALOR TKREAL:value
           {:
             if(existeSimbolo(id)) {
               parser.error("Parametro " + id + " redefinido");
             } else {
               addSimbolo(id);
+							RESULT = value;
             }
           :}
-        | TKKEYW_PARAM TKIDPAR:id TKDDOT TKTYPE_REAL TKASSIGN Expr
+        | TKKEYW_PARAM TKIDPAR:id TKDDOT TKTYPE_REAL TKASSIGN Expr:e
           {:
             if(existeSimbolo(id)) {
               parser.error("Parametro " + id + " redefinido");
             } else {
               addSimbolo(id);
+							RESULT = e;
             }
           :};
 
