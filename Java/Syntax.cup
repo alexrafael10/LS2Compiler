@@ -1,3 +1,15 @@
+/*
+	Universidad Nacional Experimental de Guayana
+	Proyecto de Carrera: Ing. Informatica
+	Lenguajes y Compiladores.
+
+	Integrantes
+	Alexis Rondón
+	Carlos Cesín
+	Rover Gonzales
+	Johans Cedeño
+*/
+
 import java_cup.runtime.*;
 import java.util.*;
 import java.io.*;
